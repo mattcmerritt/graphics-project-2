@@ -157,20 +157,38 @@ def draw_scene():
 # Draw the entire scene - cylinders and spheres, oh my!
 def draw():
     glPushMatrix()
-    for i in range(-3,4):     # i goes from -3 to 3 (inclusive)
-        for j in range(-3,4): # j does the same
-            glPushMatrix()
-            glTranslated(i*10, 0, j*10)  # Move to a "grid spot"
-            glRotated(-90, 1, 0, 0)       # So it draws cylinder upwards
-            if i == -3 and j == 3:
-                # Draw a cone for this one
-                gluCylinder(tube, 2, 0, cylinder_height, 40, 5)
-            elif (i + j) % 2 == 0:
-                gluCylinder(tube, 2, 2, cylinder_height, 40, 5)
-            else:
-                gluCylinder(tube, 2, 2, MAX_CYLINDER_HEIGHT - cylinder_height, 40, 5)
-            glPopMatrix()
+    # TODO: determine necessary transformations
+    drawCone(-10, 0, 0)
+    drawCone(10, 0, 0)
+    drawCar()
+
+    # for i in range(-3,4):     # i goes from -3 to 3 (inclusive)
+    #     for j in range(-3,4): # j does the same
+    #         glPushMatrix()
+    #         glTranslated(i*10, 0, j*10)  # Move to a "grid spot"
+    #         glRotated(-90, 1, 0, 0)       # So it draws cylinder upwards
+    #         if i == -3 and j == 3:
+    #             # Draw a cone for this one
+    #             gluCylinder(tube, 2, 0, cylinder_height, 40, 5)
+    #         elif (i + j) % 2 == 0:
+    #             gluCylinder(tube, 2, 2, cylinder_height, 40, 5)
+    #         else:
+    #             gluCylinder(tube, 2, 2, MAX_CYLINDER_HEIGHT - cylinder_height, 40, 5)
+    #         glPopMatrix()
     glPopMatrix()
+
+#=======================================
+# Scene-drawing functions
+#=======================================
+def drawCone(x, y, z):
+    pass
+
+def drawCar():
+    # drawWheel should be called 4 times in here
+    pass
+
+def drawWheel():
+    pass
     
 #=======================================
 # Direct OpenGL Matrix Operation Examples
