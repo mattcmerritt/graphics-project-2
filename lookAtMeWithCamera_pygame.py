@@ -26,17 +26,23 @@ DELAY = int(1000.0 / FPS + 0.5)
 window_dimensions = (1000, 800)
 name = b'Look At Me, Mom!'
 animate = False
+viewAngle = 0
 MAX_CYLINDER_HEIGHT = 10
 cylinder_height = MAX_CYLINDER_HEIGHT/2
 cylinder_step = 0.03
-eye = Point(0, 10, 70)
+#eye = Point(0, 10, 70)
 # look = Point(0, 0, 0)
-lookD = Vector(Point(0, 0, -1))
-up = Vector(Point(0, 1, 0))  # Usually what you want unless you want a tilted camera
-camera = Camera(CAM_ANGLE, window_dimensions[0]/window_dimensions[1], CAM_NEAR, CAM_FAR)
+#lookD = Vector(Point(0, 0, -1))
+#up = Vector(Point(0, 1, 0))  # Usually what you want unless you want a tilted camera
+#camera = Camera(CAM_ANGLE, window_dimensions[0]/window_dimensions[1], CAM_NEAR, CAM_FAR)
 
 def main():
     init()
+    global camera
+    camera = Camera(CAM_ANGLE, window_dimensions[0]/window_dimensions[1], CAM_NEAR, CAM_FAR)
+    camera.eye = Point(0, 5, 30)  # Position the camera
+    camera.look = Point(0, 0, 0)  # Look at the center of the scene
+    camera.up = Vector(Point(0, 1, 0))  # Set up vector
 
     # Enters the main loop.   
     # Displays the window and starts listening for events.
@@ -49,7 +55,8 @@ def init():
 
     # pygame setup
     pygame.init()
-    screen = pygame.display.set_mode(window_dimensions, pygame.DOUBLEBUF|pygame.OPENGL)
+    pygame.key.set_repeat(300, 50)
+    pygame.display.set_mode(window_dimensions, pygame.DOUBLEBUF|pygame.OPENGL)
     clock = pygame.time.Clock()
     running = True
 
@@ -64,7 +71,7 @@ def main_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.KEYUP:
+            elif event.type == pygame.KEYDOWN:
                 keyboard(event)
 
         if animate:
@@ -90,8 +97,9 @@ def display():
     camera.setProjection()
     
     # Clear the Screen
-    glClearColor(0.0, 0.0, 0.0, 0.0)
+    glClearColor(1.0, 1.0, 1.0, 1.0)
     glClear(GL_COLOR_BUFFER_BIT)
+
 
     # And draw the "Scene"
     glColor3f(1.0, 1.0, 1.0)
@@ -116,7 +124,7 @@ def advance():
 # Function used to handle any key events
 # event: The keyboard event that happened
 def keyboard(event):
-    global running, animate
+    global running, animate, viewAngle
     key = event.key # "ASCII" value of the key pressed
     if key == 27:  # ASCII code 27 = ESC-key
         running = False
@@ -140,6 +148,12 @@ def keyboard(event):
     elif key == ord('e'):
         # Go down
         camera.slide(0,-1,0)
+    elif key == pygame.K_LEFT:
+        # turn world left
+        viewAngle += 1
+    elif key == pygame.K_RIGHT:
+        # turn world right
+        viewAngle -= 1
 
 def draw_scene():
     """
@@ -149,15 +163,18 @@ def draw_scene():
     # Place the camera
     glMatrixMode(GL_MODELVIEW);
     camera.placeCamera()
-        
+    
     # Now transform the world
     glColor3f(1, 1, 1)
+    glRotate(viewAngle, 0, 1, 0)
     draw() 
 
 # Draw the entire scene - cylinders and spheres, oh my!
 def draw():
     glPushMatrix()
     # TODO: determine necessary transformations
+    drawGrid(20, 1)  # Draw a 40x40 grid with 1 unit steps
+    glColor3f(0.0, 0.0, 0.0)  # Set color to black for contrast against white background
     drawCone(-10, 0, 0)
     drawCone(10, 0, 0)
     drawCar()
@@ -181,7 +198,11 @@ def draw():
 # Scene-drawing functions
 #=======================================
 def drawCone(x, y, z):
-    pass
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    glRotatef(-90, 1, 0, 0) 
+    gluCylinder(tube, 1, 0.2, 8, 20, 10)  # Base radius, top radius, height, 20 slices and stacks
+    glPopMatrix()
 
 def drawCar():
     # drawWheel should be called 4 times in here
@@ -189,7 +210,16 @@ def drawCar():
 
 def drawWheel():
     pass
-    
+
+def drawGrid(size, steps):
+    glBegin(GL_LINES)
+    glColor3f(0.5, 0.5, 0.5) 
+    for i in range(-size, size+1, steps):
+        glVertex3f(i, 0, -size)
+        glVertex3f(i, 0, size)
+        glVertex3f(-size, 0, i)
+        glVertex3f(size, 0, i)
+    glEnd() 
 #=======================================
 # Direct OpenGL Matrix Operation Examples
 #=======================================
