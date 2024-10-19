@@ -177,7 +177,7 @@ def draw():
     glColor3f(0.0, 0.0, 0.0)  # Set color to black for contrast against white background
     drawCone(-10, 0, 0)
     drawCone(10, 0, 0)
-    drawCar()
+    drawCar(0, 0.75, 2)
 
     # for i in range(-3,4):     # i goes from -3 to 3 (inclusive)
     #     for j in range(-3,4): # j does the same
@@ -204,9 +204,54 @@ def drawCone(x, y, z):
     gluCylinder(tube, 1, 0.2, 8, 20, 10)  # Base radius, top radius, height, 20 slices and stacks
     glPopMatrix()
 
-def drawCar():
+def drawCar(x, y, z):
     # drawWheel should be called 4 times in here
-    pass
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    drawRect(6, 1, 8) # body
+    
+    # spoiler
+    glPushMatrix()
+    glTranslatef(0, 1, -2.5)
+    drawRect(6, 1, 1) 
+    glPopMatrix()
+
+    glPopMatrix()
+
+def drawRect(w, h, l):
+    glPushMatrix()
+    # note: "front" = side toward initial camera
+    # top
+    glBegin(GL_LINE_LOOP)
+    glVertex3f(-w/2, h/2, -l/2) # front left
+    glVertex3f(w/2, h/2, -l/2) # front right
+    glVertex3f(w/2, h/2, l/2) # back right
+    glVertex3f(-w/2, h/2, l/2) # back left
+    glEnd()
+    # bottom
+    glBegin(GL_LINE_LOOP)
+    glVertex3f(-w/2, -h/2, -l/2) # front left
+    glVertex3f(w/2, -h/2, -l/2) # front right
+    glVertex3f(w/2, -h/2, l/2) # back right
+    glVertex3f(-w/2, -h/2, l/2) # back left
+    glEnd()
+    # connectors
+    glBegin(GL_LINES)
+    # front left
+    glVertex3f(-w/2, h/2, -l/2)
+    glVertex3f(-w/2, -h/2, -l/2)
+    # front right
+    glVertex3f(w/2, h/2, -l/2)
+    glVertex3f(w/2, -h/2, -l/2)
+    # back right
+    glVertex3f(w/2, h/2, l/2)
+    glVertex3f(w/2, -h/2, l/2)
+    # back left
+    glVertex3f(-w/2, h/2, l/2)
+    glVertex3f(-w/2, -h/2, l/2)
+    glEnd()
+
+    glPopMatrix()
 
 def drawWheel():
     pass
