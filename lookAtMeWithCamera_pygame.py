@@ -1,9 +1,10 @@
 #==============================
-# Christian Duncan
+# Matthew Merritt, Michael Merritt, Harsh Gandhi
 # CSC345/CSC645: Computer Graphics
 #   Fall 2024
 # Description:
-#   Demonstrates use of a Camera class for easier navigation
+#   Displays a scene with an animated car and moving camera,
+#   Boilerplate code is reused from examples in class.
 #==============================
 
 import sys
@@ -22,19 +23,19 @@ CAM_ANGLE = 60.0
 FPS = 60.0
 DELAY = int(1000.0 / FPS + 0.5)
 
-# Global (Module) Variables (ARGH!)
+# Global (Module) Variables
 window_dimensions = (1000, 800)
-name = b'Look At Me, Mom!'
+name = b'Project 2'
 animate = False
 viewAngle = 0
-MAX_CYLINDER_HEIGHT = 10
-cylinder_height = MAX_CYLINDER_HEIGHT/2
-cylinder_step = 0.03
-#eye = Point(0, 10, 70)
+spinAngle = 0
+
+# Old camera information
+# eye = Point(0, 10, 70)
 # look = Point(0, 0, 0)
-#lookD = Vector(Point(0, 0, -1))
-#up = Vector(Point(0, 1, 0))  # Usually what you want unless you want a tilted camera
-#camera = Camera(CAM_ANGLE, window_dimensions[0]/window_dimensions[1], CAM_NEAR, CAM_FAR)
+# lookD = Vector(Point(0, 0, -1))
+# up = Vector(Point(0, 1, 0))  # Usually what you want unless you want a tilted camera
+# camera = Camera(CAM_ANGLE, window_dimensions[0]/window_dimensions[1], CAM_NEAR, CAM_FAR)
 
 def main():
     init()
@@ -110,21 +111,15 @@ def display():
 
 # Advance the scene one frame
 def advance():
-    global cylinder_height, cylinder_step
-    cylinder_height += cylinder_step
-    if cylinder_height <= 0:
-        # Reached the bottom - switch directions
-        cylinder_height = 0
-        cylinder_step = -cylinder_step
-    elif cylinder_height >= MAX_CYLINDER_HEIGHT:
-        # Reached the top - switch directions
-        cylinder_height = MAX_CYLINDER_HEIGHT
-        cylinder_step = -cylinder_step
+    # TODO: determine what else happens here
+    global spinAngle
+    # update the wheel spin angle
+    spinAngle += 1
 
 # Function used to handle any key events
 # event: The keyboard event that happened
 def keyboard(event):
-    global running, animate, viewAngle
+    global running, animate, viewAngle, spinAngle
     key = event.key # "ASCII" value of the key pressed
     if key == 27:  # ASCII code 27 = ESC-key
         running = False
@@ -169,34 +164,25 @@ def draw_scene():
     glRotate(viewAngle, 0, 1, 0)
     draw() 
 
-# Draw the entire scene - cylinders and spheres, oh my!
+# Draw the entire scene - cones and car
 def draw():
     glPushMatrix()
+
     # TODO: determine necessary transformations
+
     drawGrid(20, 1)  # Draw a 40x40 grid with 1 unit steps
     glColor3f(0.0, 0.0, 0.0)  # Set color to black for contrast against white background
     drawCone(-10, 0, 0)
     drawCone(10, 0, 0)
     drawCar(0, 0.75, 2)
 
-    # for i in range(-3,4):     # i goes from -3 to 3 (inclusive)
-    #     for j in range(-3,4): # j does the same
-    #         glPushMatrix()
-    #         glTranslated(i*10, 0, j*10)  # Move to a "grid spot"
-    #         glRotated(-90, 1, 0, 0)       # So it draws cylinder upwards
-    #         if i == -3 and j == 3:
-    #             # Draw a cone for this one
-    #             gluCylinder(tube, 2, 0, cylinder_height, 40, 5)
-    #         elif (i + j) % 2 == 0:
-    #             gluCylinder(tube, 2, 2, cylinder_height, 40, 5)
-    #         else:
-    #             gluCylinder(tube, 2, 2, MAX_CYLINDER_HEIGHT - cylinder_height, 40, 5)
-    #         glPopMatrix()
     glPopMatrix()
 
 #=======================================
 # Scene-drawing functions
 #=======================================
+
+# function to draw a singular cone
 def drawCone(x, y, z):
     glPushMatrix()
     glTranslatef(x, y, z)
@@ -204,20 +190,76 @@ def drawCone(x, y, z):
     gluCylinder(tube, 1, 0.2, 8, 20, 10)  # Base radius, top radius, height, 20 slices and stacks
     glPopMatrix()
 
+# function to draw the car, including the body and wheels
 def drawCar(x, y, z):
-    # drawWheel should be called 4 times in here
     glPushMatrix()
     glTranslatef(x, y, z)
-    drawRect(6, 1, 8) # body
+
+    # car body dimensions
+    #   needed to properly offset other components
+    width = 6
+    height = 1
+    length = 8
+
+    # body
+    drawRect(width, height, length) 
     
     # spoiler
     glPushMatrix()
-    glTranslatef(0, 1, -2.5)
-    drawRect(6, 1, 1) 
+    glTranslatef(0, height, -2.5)
+    drawRect(width, height, 1) 
     glPopMatrix()
+
+    # adding the wheels
+    # left wheels
+    drawWheel(-width/2, 0, -(length/2 - 0.75), -90)
+    drawWheel(-width/2, 0, (length/2 - 0.75), -90)
+
+    # right wheels
+    drawWheel(width/2, 0, -(length/2 - 0.75), 90)
+    drawWheel(width/2, 0, (length/2 - 0.75), 90)
 
     glPopMatrix()
 
+# function to draw a rotating wheel of the car
+def drawWheel(x, y, z, rotation):
+    glPushMatrix()
+
+    # Move the wheel to the desired location
+    glTranslatef(x, y, z)
+    # Rotate the wheel about the Y-axis so it is facing the proper way
+    glRotatef(rotation, 0, 1, 0)
+
+    # Rotate the wheel about the Z-axis to mimic the wheel spinning
+    # Note: since the wheels on the left are rotated with a negative angle,
+    #   they will spin the opposite way normally (for example, moving 
+    #   clockwise instead of counterclockwise). To correct this, the spin 
+    #   angle is changed to its opposite value.
+    if rotation < 0:
+        glRotatef(spinAngle, 0, 0, 1)
+    else:
+        glRotatef(-spinAngle, 0, 0, 1)
+    
+    # The inputs for gluCylinder are:
+    #   Quadric shape, radius of cylinder at base, radius of cylinder at top, 
+    #   height, number of sides along circumference, number of slices with lines
+    gluCylinder(tube, 0.75, 0.75, 0.5, 10, 4)
+
+    glPopMatrix()
+    pass
+
+# utility function to draw a grid / plane
+def drawGrid(size, steps):
+    glBegin(GL_LINES)
+    glColor3f(0.5, 0.5, 0.5) 
+    for i in range(-size, size+1, steps):
+        glVertex3f(i, 0, -size)
+        glVertex3f(i, 0, size)
+        glVertex3f(-size, 0, i)
+        glVertex3f(size, 0, i)
+    glEnd() 
+
+# utility method to draw a rectangular prism
 def drawRect(w, h, l):
     glPushMatrix()
     # note: "front" = side toward initial camera
@@ -253,18 +295,6 @@ def drawRect(w, h, l):
 
     glPopMatrix()
 
-def drawWheel():
-    pass
-
-def drawGrid(size, steps):
-    glBegin(GL_LINES)
-    glColor3f(0.5, 0.5, 0.5) 
-    for i in range(-size, size+1, steps):
-        glVertex3f(i, 0, -size)
-        glVertex3f(i, 0, size)
-        glVertex3f(-size, 0, i)
-        glVertex3f(size, 0, i)
-    glEnd() 
 #=======================================
 # Direct OpenGL Matrix Operation Examples
 #=======================================
