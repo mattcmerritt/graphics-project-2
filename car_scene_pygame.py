@@ -35,9 +35,11 @@ viewAngle = 0
 spinAngle = 0
 movingForward = True
 distance = 0
+gridEnabled = True
 # Constants
 WHEEL_RADIUS = 0.75
 MAX_ROTATIONS = 3
+SPEED = 2
 
 # Camera information
 # eye = Point(0, 10, 70)
@@ -123,9 +125,9 @@ def advance():
     global spinAngle, movingForward, distance
     # update the wheel spin angle
     if movingForward:
-        spinAngle -= 1
+        spinAngle -= SPEED
     else:
-        spinAngle += 1
+        spinAngle += SPEED
 
     # switch movement direction if the car moves far enough
     if spinAngle >= 360 * MAX_ROTATIONS:
@@ -141,7 +143,7 @@ def advance():
 # Function used to handle any key events
 # event: The keyboard event that happened
 def keyboard(event):
-    global running, animate, viewAngle, spinAngle
+    global running, animate, viewAngle, spinAngle, gridEnabled
     key = event.key # "ASCII" value of the key pressed
     if key == 27:  # ASCII code 27 = ESC-key
         running = False
@@ -171,6 +173,9 @@ def keyboard(event):
     elif key == pygame.K_RIGHT:
         # turn world right
         viewAngle -= 1
+    elif key == ord('g'):
+        # toggle grid
+        gridEnabled = not gridEnabled
 
 def draw_scene():
     """
@@ -190,7 +195,9 @@ def draw_scene():
 def draw():
     glPushMatrix()
 
-    drawGrid(20, 1)  # Draw a 40x40 grid with 1 unit steps
+    if gridEnabled:
+        drawGrid(20, 1)  # Draw a 40x40 grid with 1 unit steps
+    
     glColor3f(0.0, 0.0, 0.0)  # Set color to black for contrast against white background
     drawCone(-10, 0, 0)
     drawCone(10, 0, 0)
