@@ -36,10 +36,12 @@ spinAngle = 0
 movingForward = True
 distance = 0
 gridEnabled = True
+speed = 1
 # Constants
 WHEEL_RADIUS = 0.75
 MAX_ROTATIONS = 3
-SPEED = 2
+MIN_SPEED = 0.125
+MAX_SPEED = 16
 
 # Camera information
 # eye = Point(0, 10, 70)
@@ -125,9 +127,9 @@ def advance():
     global spinAngle, movingForward, distance
     # update the wheel spin angle
     if movingForward:
-        spinAngle -= SPEED
+        spinAngle -= speed
     else:
-        spinAngle += SPEED
+        spinAngle += speed
 
     # switch movement direction if the car moves far enough
     if spinAngle >= 360 * MAX_ROTATIONS:
@@ -143,7 +145,7 @@ def advance():
 # Function used to handle any key events
 # event: The keyboard event that happened
 def keyboard(event):
-    global running, animate, viewAngle, spinAngle, gridEnabled
+    global running, animate, viewAngle, spinAngle, gridEnabled, speed
     key = event.key # "ASCII" value of the key pressed
     if key == 27:  # ASCII code 27 = ESC-key
         running = False
@@ -176,6 +178,12 @@ def keyboard(event):
     elif key == ord('g'):
         # toggle grid
         gridEnabled = not gridEnabled
+    elif key == pygame.K_UP:
+        # speed up car
+        speed = min(speed * 2, MAX_SPEED)
+    elif key == pygame.K_DOWN:
+        # slow down car
+        speed = max(speed / 2, MIN_SPEED)
 
 def draw_scene():
     """
