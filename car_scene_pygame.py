@@ -120,7 +120,6 @@ def display():
 
 # Advance the scene one frame
 def advance():
-    # TODO: determine what else happens here
     global spinAngle, movingForward, distance
     # update the wheel spin angle
     if movingForward:
@@ -128,6 +127,7 @@ def advance():
     else:
         spinAngle += 1
 
+    # switch movement direction if the car moves far enough
     if spinAngle >= 360 * MAX_ROTATIONS:
         movingForward = True
     elif spinAngle <= -360 * MAX_ROTATIONS:
@@ -190,13 +190,11 @@ def draw_scene():
 def draw():
     glPushMatrix()
 
-    # TODO: determine necessary transformations
-
     drawGrid(20, 1)  # Draw a 40x40 grid with 1 unit steps
     glColor3f(0.0, 0.0, 0.0)  # Set color to black for contrast against white background
     drawCone(-10, 0, 0)
     drawCone(10, 0, 0)
-    drawCar(0, 0.75, 2 + distance)
+    drawCar(0, WHEEL_RADIUS, 2 + distance)
 
     glPopMatrix()
 
