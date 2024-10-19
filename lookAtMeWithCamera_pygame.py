@@ -9,6 +9,7 @@
 
 import sys
 import pygame
+import math
 from OpenGL.GLU import *
 from OpenGL.GL import *
 from utils import *
@@ -24,13 +25,21 @@ FPS = 60.0
 DELAY = int(1000.0 / FPS + 0.5)
 
 # Global (Module) Variables
+
+# Window data
 window_dimensions = (1000, 800)
 name = b'Project 2'
 animate = False
 viewAngle = 0
+# Car position / state information
 spinAngle = 0
+movingForward = True
+distance = 0
+# Constants
+WHEEL_RADIUS = 0.75
+MAX_ROTATIONS = 3
 
-# Old camera information
+# Camera information
 # eye = Point(0, 10, 70)
 # look = Point(0, 0, 0)
 # lookD = Vector(Point(0, 0, -1))
@@ -112,9 +121,22 @@ def display():
 # Advance the scene one frame
 def advance():
     # TODO: determine what else happens here
-    global spinAngle
+    global spinAngle, movingForward, distance
     # update the wheel spin angle
-    spinAngle += 1
+    if movingForward:
+        spinAngle -= 1
+    else:
+        spinAngle += 1
+
+    if spinAngle >= 360 * MAX_ROTATIONS:
+        movingForward = True
+    elif spinAngle <= -360 * MAX_ROTATIONS:
+        movingForward = False
+
+    # determine how far the car has moved using the spinAngle
+    # uses the arc length traveled by wheel as it spins, with the
+    #   assumption that the wheel is perfectly circular
+    distance = spinAngle * (math.pi / 180) * WHEEL_RADIUS
 
 # Function used to handle any key events
 # event: The keyboard event that happened
@@ -174,7 +196,7 @@ def draw():
     glColor3f(0.0, 0.0, 0.0)  # Set color to black for contrast against white background
     drawCone(-10, 0, 0)
     drawCone(10, 0, 0)
-    drawCar(0, 0.75, 2)
+    drawCar(0, 0.75, 2 + distance)
 
     glPopMatrix()
 
@@ -212,12 +234,12 @@ def drawCar(x, y, z):
 
     # adding the wheels
     # left wheels
-    drawWheel(-width/2, 0, -(length/2 - 0.75), -90)
-    drawWheel(-width/2, 0, (length/2 - 0.75), -90)
+    drawWheel(-width/2, 0, -(length/2 - WHEEL_RADIUS), -90)
+    drawWheel(-width/2, 0, (length/2 - WHEEL_RADIUS), -90)
 
     # right wheels
-    drawWheel(width/2, 0, -(length/2 - 0.75), 90)
-    drawWheel(width/2, 0, (length/2 - 0.75), 90)
+    drawWheel(width/2, 0, -(length/2 - WHEEL_RADIUS), 90)
+    drawWheel(width/2, 0, (length/2 - WHEEL_RADIUS), 90)
 
     glPopMatrix()
 
@@ -236,14 +258,14 @@ def drawWheel(x, y, z, rotation):
     #   clockwise instead of counterclockwise). To correct this, the spin 
     #   angle is changed to its opposite value.
     if rotation < 0:
-        glRotatef(spinAngle, 0, 0, 1)
-    else:
         glRotatef(-spinAngle, 0, 0, 1)
+    else:
+        glRotatef(spinAngle, 0, 0, 1)
     
     # The inputs for gluCylinder are:
     #   Quadric shape, radius of cylinder at base, radius of cylinder at top, 
     #   height, number of sides along circumference, number of slices with lines
-    gluCylinder(tube, 0.75, 0.75, 0.5, 10, 4)
+    gluCylinder(tube, WHEEL_RADIUS, WHEEL_RADIUS, 0.5, 10, 4)
 
     glPopMatrix()
     pass
