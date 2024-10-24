@@ -151,18 +151,24 @@ def keyboard(event):
         running = False
     elif key == ord(' '):
         animate = not animate
-    elif key == ord('a'):
-        # Go left
-        camera.turn(1)
-    elif key == ord('d'):
-        # Go right
-        camera.turn(-1)
     elif key == ord('w'):
         # Go forward
         camera.slide(0,0,-1)
     elif key == ord('s'):
         # Go backward
         camera.slide(0,0,1)
+    elif key == ord('a'):
+        # Go left (relative to camera)
+        camera.slide(1,0,0)
+    elif key == ord('d'):
+        # Go right (relative to camera)
+        camera.slide(-1,0,0)
+    elif key == ord('z'):
+        # Turn camera left (counter-clockwise)
+        camera.turn(1)
+    elif key == ord('x'):
+        # Turn camera right (clockwise)
+        camera.turn(-1)
     elif key == ord('q'):
         # Go up
         camera.slide(0,1,0)

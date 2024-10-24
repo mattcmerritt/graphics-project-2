@@ -32,13 +32,15 @@ The code is divided into three files, with the following breakdown:
 In terms of controls, the following features are included:
 - `Escape` - Closes the pygame scene window and ends the program.
 - `Space` - Starts/pauses/resumes the car animation.
-- `A` - Rotates the camera left about the y-axis (effectively like turning your head).
-- `D` - Rotates the camera right about the y-axis (effectively like turning your head).
 - `W` - Moves the camera forward relative to the direction it is looking.
 - `S` - Moves the camera backward relative to the direction it is looking.
+- `A` - Moves the camera left relative to the direction it is looking.
+- `D` - Moves the camera right relative to the direction it is looking.
 - `Q` - Moves the camera up along the y-axis.
 - `E` - Moves the camera down along the y-axis.
 - `G` - Toggle the grid shown on the ground.
+- `Z` - Rotates the camera left about the y-axis (effectively like turning your head).
+- `X` - Rotates the camera right about the y-axis (effectively like turning your head).
 - `Left Arrow` - Rotates the world clockwise.
 - `Right Arrow` - Rotates the world counterclockwise.
 - `Up Arrow` - Increases the car movement speed.

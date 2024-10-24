@@ -54,14 +54,25 @@ class Camera:
                   0, 1, 0)                             # Camera is always oriented vertically
         
     def slide(self, du, dv, dn):
-        # This is not complete!  It does not move along the u-axis (x-axis)!
+        # note: sliding does not support vertical angle adjustments
+        #   the perspective is always assumed to be level with the ground
+        #   (essentially up is always Vector(Point(0, 1, 0)) for the math)
+
+        # calculating the forward vector n
         rad = math.radians(self.lookAngle)
         lookDX = math.sin(rad)
         lookDZ = math.cos(rad)
+
+        # find the u vector (rotated x-axis) using cross product of
+        #   new n vector (rotated z-axis) and v vector (up vector / y-axis)
+        n = Vector(Point(lookDX, 0, lookDZ))
+        v = Vector(Point(0, 1, 0))
+        u = n.cross(v)
+        u.normalize()
         
-        self.eye.x += dn*lookDX
+        self.eye.x += du * u.dx + dn * n.dx
         self.eye.y += dv
-        self.eye.z += dn*lookDZ
+        self.eye.z += du * u.dz + dn * n.dz
     
     def turn(self, angle):
         """ Turn the camera by the given angle"""
