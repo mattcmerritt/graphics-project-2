@@ -48,4 +48,4 @@ In terms of controls, the following features are included:
 
 ### Bonus Features
 
-The grid is included to help with visualizing the rotations and current position of the camera. The speed of the car can also be adjusted, with the distance travelled corresponding to the arc length travelled by the wheels. Additionally, the speed of the car is capped, only being able to increase or decrease between 8 different speeds. 
+The grid is included to help with visualizing the rotations and current position of the camera. The camera can be moved in all four directions relative to the direction that the camera is currently facing using the W, A, S, and D keys for forward, left, backward, and right, respectively. The camera angle can be rotated along the y-axis using the Z and X keys. Finally, the speed of the car can also be adjusted with the up and down arrow keys, with the distance travelled corresponding to the arc length travelled by the wheels. The speed of the car is capped, only being able to increase or decrease between 8 different speeds. 
